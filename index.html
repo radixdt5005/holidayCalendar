@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Calendar Application</title>
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th, td {
+        border: 1px solid black;
+        text-align: center;
+        padding: 10px;
+      }
+      th {
+        background-color: #ddd;
+      }
+      .important {
+        background-color: #ffcccc;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Calendar Application</h1>
+    <table>
+      <tr>
+        <th>Sun</th>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+      </tr>
+    </table>
+    <script>
+      const apiUrl = 'https://date.nager.at/api/v3/PublicHolidays/2023/US';
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          const table = document.querySelector('table');
+          const rows = table.rows;
+          let rowIndex = 1;
+          let dayIndex = 0;
+          let currentDate = new Date(2023, 0, 1);
+          while (currentDate.getFullYear() === 2023) {
+            const row = rows[rowIndex];
+            if (!row) {
+              const newRow = table.insertRow();
+              newRow.insertCell();
+              newRow.insertCell();
+              newRow.insertCell();
+              newRow.insertCell();
+              newRow.insertCell();
+              newRow.insertCell();
+              newRow.insertCell();
+              rows[rowIndex] = newRow;
+            }
+            const cell = row.cells[dayIndex];
+            if (cell) {
+              cell.textContent = currentDate.getDate();
+              const holiday = data.find(holiday => new Date(holiday.date).getTime() === currentDate.getTime());
+              if (holiday) {
+                cell.classList.add('important');
+                cell.title = holiday.name;
+              }
+            }
+            currentDate.setDate(currentDate.getDate() + 1);
+            dayIndex++;
+            if (dayIndex > 6) {
+              dayIndex = 0;
+              rowIndex++;
+            }
+          }
+        })
+        .catch(error => console.error());
+    </script>
+  </body>
+</html>
